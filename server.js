@@ -62,6 +62,7 @@ ensureDataFiles();
 // ─── Chat ────────────────────────────────────────────────────────────────────
 
 app.post('/api/chat', async (req, res) => {
+  console.log('[chat] incoming request from', req.ip);
   const { message, businessConfig = {}, conversationHistory = [] } = req.body;
 
   if (!message || typeof message !== 'string') {
