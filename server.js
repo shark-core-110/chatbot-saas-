@@ -116,6 +116,9 @@ app.post('/api/chat', async (req, res) => {
     { role: 'user', content: message.trim() },
   ];
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -123,8 +126,11 @@ app.post('/api/chat', async (req, res) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       },
-      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages, max_tokens: 512 }),
+      body: JSON.stringify({ model: 'llama3-8b-8192', messages, max_tokens: 512 }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!groqRes.ok) {
       const body = await groqRes.text();
@@ -137,6 +143,7 @@ app.post('/api/chat', async (req, res) => {
     const data = await groqRes.json();
     res.json({ response: data.choices[0].message.content });
   } catch (err) {
+    clearTimeout(timeoutId);
     console.error('Groq fetch error:');
     console.error('  name   :', err.name);
     console.error('  message:', err.message);
