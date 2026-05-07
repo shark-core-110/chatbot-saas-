@@ -4,7 +4,6 @@ require('dotenv').config(); // must be first — loads .env before any module re
 
 const express = require('express');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
 const fs = require('fs');
 const path = require('path');
 
@@ -33,16 +32,6 @@ app.get('/widget.js', (req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-const limiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 50,
-  standardHeaders: true,
-  legacyHeaders: false,
-  validate: { xForwardedForHeader: false },
-  message: { error: 'Rate limit exceeded. Please try again later.' },
-});
-app.use('/api/', limiter);
 
 // ─── Data helpers ────────────────────────────────────────────────────────────
 
