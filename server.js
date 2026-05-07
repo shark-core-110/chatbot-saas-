@@ -39,6 +39,7 @@ const limiter = rateLimit({
   max: 50,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { error: 'Rate limit exceeded. Please try again later.' },
 });
 app.use('/api/', limiter);
