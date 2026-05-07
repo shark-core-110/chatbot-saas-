@@ -30,6 +30,8 @@
     apiUrl: getApiUrl(),
   };
 
+  console.log('[ChatBot] widget loaded — api:', cfg.apiUrl);
+
   // ─── State ────────────────────────────────────────────────────────────────
 
   var isOpen = false;
@@ -323,21 +325,16 @@
       }),
     })
       .then(function (r) {
-        if (!r.ok) {
-          return r.text().then(function (body) {
-            console.error('[ChatBot] API error ' + r.status + ':', body);
-            throw new Error('HTTP ' + r.status);
-          });
-        }
-        return r.json();
+        // Parse the body regardless of status — the server always returns JSON
+        return r.json().catch(function () { return { error: 'HTTP ' + r.status }; });
       })
       .then(function (data) {
         hideTyping();
         sendBtnEl.disabled = false;
 
         if (data.error) {
-          console.error('[ChatBot] API returned error:', data.error);
-          addMsg("Sorry, I'm having trouble right now. Please try again in a moment.", 'bot');
+          console.error('[ChatBot] API error:', data.error);
+          addMsg("Sorry, I'm having trouble connecting right now. Please try again in a moment.", 'bot');
           history.pop();
           return;
         }
@@ -350,7 +347,7 @@
         }
       })
       .catch(function (err) {
-        console.error('[ChatBot] fetch error:', err.message || err);
+        console.error('[ChatBot] fetch error — target:', cfg.apiUrl + '/api/chat', '— reason:', err.message || err);
         hideTyping();
         sendBtnEl.disabled = false;
         addMsg('Connection error. Please check your network and try again.', 'bot');

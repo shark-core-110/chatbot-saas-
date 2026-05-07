@@ -20,7 +20,8 @@ console.log('✅  Groq client ready');
 
 // ─── Middleware ──────────────────────────────────────────────────────────────
 
-app.use(cors());
+app.use(cors({ origin: '*', methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type'] }));
+app.options('*', cors());
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/widget.js', (req, res, next) => {
