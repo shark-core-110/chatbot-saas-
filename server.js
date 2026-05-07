@@ -271,6 +271,12 @@ app.get('/api/stats', (req, res) => {
   });
 });
 
+// ─── Health ──────────────────────────────────────────────────────────────────
+
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, uptime: process.uptime() });
+});
+
 // ─── Bot Preview ─────────────────────────────────────────────────────────────
 
 app.get('/preview', (req, res) => {
@@ -333,4 +339,14 @@ app.listen(PORT, () => {
   console.log(`\n🚀  ChatBot SaaS  →  http://localhost:${PORT}`);
   console.log(`📊  Admin         →  http://localhost:${PORT}/`);
   console.log(`🎯  Demo          →  http://localhost:${PORT}/demo.html\n`);
+
+  if (process.env.RENDER_URL) {
+    const PING_INTERVAL_MS = 14 * 60 * 1000;
+    setInterval(() => {
+      fetch(process.env.RENDER_URL + '/api/health')
+        .then((r) => console.log(`[keep-alive] ping → ${r.status}`))
+        .catch((err) => console.error('[keep-alive] ping failed:', err.message));
+    }, PING_INTERVAL_MS);
+    console.log(`🔁  Keep-alive   →  pinging ${process.env.RENDER_URL}/api/health every 14 min`);
+  }
 });
