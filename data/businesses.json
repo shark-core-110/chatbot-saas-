@@ -1,0 +1,13 @@
+[
+  {
+    "id": "biz-1778095659832",
+    "name": "Smile Dental Clinic",
+    "industry": "Dental",
+    "services": "Teeth Cleaning, Whitening, Implants, Braces",
+    "bookingLink": "https://calendly.com/smiledental",
+    "primaryColor": "#185FA5",
+    "botName": "SmileBot",
+    "systemPrompt": "We offer free consultations. Hours: Mon-Fri 9am-6pm. Located in downtown. New patients welcome.\n\n",
+    "createdAt": "2026-05-06T19:27:39.832Z"
+  }
+]

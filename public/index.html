@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatBot SaaS — Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0f172a; --navy-mid: #1e293b; --navy-light: #334155;
+      --blue: #185FA5; --blue-h: #1a6dbf; --blue-pale: #eff6ff;
+      --white: #ffffff; --g50: #f8fafc; --g100: #f1f5f9;
+      --g200: #e2e8f0; --g400: #94a3b8; --g500: #64748b; --g700: #334155;
+      --green: #10b981; --red: #ef4444;
+      --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --r: 12px; --sh: 0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+    }
+    html,body{height:100%}
+    body{font-family:var(--font);background:var(--g50);color:var(--navy);display:flex;height:100vh;overflow:hidden}
+
+    /* sidebar */
+    #sb{width:260px;min-width:260px;background:var(--navy);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+    #sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+    .logo-wrap{display:flex;align-items:center;gap:10px}
+    .logo-icon{width:34px;height:34px;border-radius:9px;background:var(--blue);display:flex;align-items:center;justify-content:center}
+    .logo-icon svg{width:18px;height:18px;fill:#fff}
+    .logo-text{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px}
+    .logo-text span{color:#60a5fa}
+    #sb-stats{padding:14px 14px 10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+    .sb-s{background:rgba(255,255,255,.05);border-radius:8px;padding:10px}
+    .sb-s-v{font-size:22px;font-weight:800;color:#fff;line-height:1}
+    .sb-s-l{font-size:10px;color:var(--g400);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+    #sb-bh{padding:14px 14px 4px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    #sb-bh span{font-size:10.5px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.6px}
+    #biz-list{flex:1;overflow-y:auto;padding:2px 8px 8px}
+    #biz-list::-webkit-scrollbar{width:3px}
+    #biz-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+    .bi{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:2px}
+    .bi:hover{background:rgba(255,255,255,.07)}
+    .bi.active{background:rgba(24,95,165,.35)}
+    .bi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .bi-info{flex:1;min-width:0}
+    .bi-name{font-size:13px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bi.active .bi-name{color:#fff}
+    .bi-meta{font-size:11px;color:var(--g400);margin-top:1px}
+    .bi-badge{font-size:10px;font-weight:700;background:rgba(255,255,255,.1);color:var(--g400);padding:2px 6px;border-radius:10px;flex-shrink:0}
+    .bi.active .bi-badge{background:rgba(96,165,250,.2);color:#93c5fd}
+    #add-btn{margin:8px 12px 16px;flex-shrink:0;background:var(--blue);border:none;border-radius:9px;color:#fff;font-family:var(--font);font-size:13px;font-weight:600;padding:10px 16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s}
+    #add-btn:hover{background:var(--blue-h)}
+    #add-btn svg{width:15px;height:15px;fill:#fff}
+
+    /* main */
+    #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    #topbar{background:#fff;border-bottom:1px solid var(--g200);padding:0 26px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    #tb-title{font-size:15px;font-weight:700}
+    #tb-sub{font-size:12px;color:var(--g500);margin-top:1px}
+    #content{flex:1;overflow-y:auto;padding:26px}
+    #content::-webkit-scrollbar{width:4px}
+    #content::-webkit-scrollbar-thumb{background:var(--g200);border-radius:4px}
+
+    /* cards */
+    .card{background:#fff;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);margin-bottom:20px;overflow:hidden}
+    .ch{padding:14px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
+    .ct{font-size:14px;font-weight:700}
+    .cb{padding:20px}
+
+    /* stat grid */
+    .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+    .sc{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--sh);border:1px solid var(--g200)}
+    .sc-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+    .sc-ico svg{width:18px;height:18px}
+    .ico-b{background:#eff6ff} .ico-b svg{fill:var(--blue)}
+    .ico-g{background:#ecfdf5} .ico-g svg{fill:var(--green)}
+    .ico-p{background:#f5f3ff} .ico-p svg{fill:#7c3aed}
+    .ico-o{background:#fff7ed} .ico-o svg{fill:#f97316}
+    .sc-lbl{font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .sc-val{font-size:30px;font-weight:800;line-height:1}
+    .sc-sub{font-size:12px;color:var(--g500);margin-top:4px}
+
+    /* tabs */
+    .tabs{display:flex;gap:2px;background:var(--g100);border-radius:8px;padding:3px;width:fit-content}
+    .tb{padding:6px 14px;border:none;border-radius:6px;background:transparent;font-family:var(--font);font-size:13px;font-weight:600;color:var(--g500);cursor:pointer;transition:all .15s}
+    .tb.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+    /* biz header */
+    .bdh{background:#fff;border-radius:var(--r);border:1px solid var(--g200);padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:14px;box-shadow:var(--sh)}
+    .bdh-ico{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .bdh-info{flex:1}
+    .bdh-name{font-size:18px;font-weight:800;margin-bottom:2px}
+    .bdh-meta{font-size:13px;color:var(--g500)}
+    .bdh-acts{display:flex;gap:8px}
+
+    /* code block */
+    .code{background:var(--navy);border-radius:10px;padding:16px 18px;font-family:'Courier New',Consolas,monospace;font-size:12px;line-height:1.8;color:#a5f3fc;overflow-x:auto;white-space:pre;margin-bottom:12px}
+
+    /* leads table */
+    .lt{width:100%;border-collapse:collapse;font-size:13.5px}
+    .lt th{text-align:left;padding:9px 14px;font-size:10.5px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--g200);background:var(--g50)}
+    .lt td{padding:11px 14px;border-bottom:1px solid var(--g100)}
+    .lt tr:last-child td{border-bottom:none}
+    .lt tr:hover td{background:var(--g50)}
+    .ln{font-weight:600}
+    .le{color:var(--g500);font-size:12.5px}
+    .ltd{color:var(--g400);font-size:12px}
+
+    /* form */
+    .fg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .fi{display:flex;flex-direction:column;gap:5px}
+    .fi.full{grid-column:1/-1}
+    .fl{font-size:12.5px;font-weight:600;color:var(--g700)}
+    .fin,.fse,.fta{border:1.5px solid var(--g200);border-radius:8px;padding:9px 12px;font-family:var(--font);font-size:13.5px;color:var(--navy);background:#fff;outline:none;transition:border-color .2s;width:100%}
+    .fin:focus,.fse:focus,.fta:focus{border-color:var(--blue)}
+    .fta{resize:vertical;min-height:80px;line-height:1.5}
+    .fhint{font-size:11.5px;color:var(--g400)}
+    .cr{display:flex;align-items:center;gap:8px}
+    .cr input[type=color]{width:38px;height:38px;border:1.5px solid var(--g200);border-radius:8px;cursor:pointer;padding:2px;background:#fff;flex-shrink:0}
+    .cr .fin{flex:1}
+
+    /* buttons */
+    .btn{padding:9px 18px;border-radius:8px;border:none;font-family:var(--font);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:7px;line-height:1}
+    .btn svg{width:14px;height:14px}
+    .btn-p{background:var(--blue);color:#fff} .btn-p:hover{background:var(--blue-h)} .btn-p svg{fill:#fff}
+    .btn-o{background:#fff;color:var(--navy);border:1.5px solid var(--g200)} .btn-o:hover{border-color:var(--g400);background:var(--g50)}
+    .btn-gh{background:transparent;color:var(--g500);padding:7px 10px} .btn-gh:hover{background:var(--g100);color:var(--navy)} .btn-gh svg{fill:currentColor}
+    .btn-d{background:#fef2f2;color:var(--red);border:1.5px solid #fee2e2} .btn-d:hover{background:#fee2e2}
+    .btn-sm{padding:6px 12px;font-size:12.5px}
+
+    /* empty */
+    .es{text-align:center;padding:48px 20px;color:var(--g400)}
+    .es svg{width:38px;height:38px;fill:var(--g300);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto}
+    .es p{font-size:13.5px}
+
+    /* toast */
+    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:10px 20px;border-radius:10px;font-size:13.5px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:transform .25s ease;pointer-events:none}
+    #toast.show{transform:translateX(-50%) translateY(0)}
+
+    /* modal */
+    #mo{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+    #mo.open{display:flex}
+    #md{background:#fff;border-radius:16px;width:600px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    #md::-webkit-scrollbar{width:4px}
+    #md::-webkit-scrollbar-thumb{background:var(--g200);border-radius:4px}
+    #md-h{padding:20px 22px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
+    #md-title{font-size:16px;font-weight:800}
+    #md-b{padding:22px}
+    #md-f{padding:14px 22px;border-top:1px solid var(--g100);display:flex;justify-content:flex-end;gap:10px}
+
+    /* preview */
+    .pw{border-radius:var(--r);overflow:hidden;border:1px solid var(--g200)}
+    .pw iframe{width:100%;height:500px;border:none;display:block}
+
+    /* welcome */
+    .wh{text-align:center;padding:40px 20px 20px}
+    .wh h2{font-size:24px;font-weight:800;margin-bottom:8px}
+    .wh p{font-size:14px;color:var(--g500);max-width:400px;margin:0 auto 24px;line-height:1.6}
+  </style>
+</head>
+<body>
+
+<aside id="sb">
+  <div id="sb-logo">
+    <div class="logo-wrap">
+      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+      <span class="logo-text">ChatBot<span>SaaS</span></span>
+    </div>
+  </div>
+  <div id="sb-stats">
+    <div class="sb-s"><div class="sb-s-v" id="sb-bc">0</div><div class="sb-s-l">Clients</div></div>
+    <div class="sb-s"><div class="sb-s-v" id="sb-lc">0</div><div class="sb-s-l">Leads</div></div>
+  </div>
+  <div id="sb-bh"><span>Your Clients</span></div>
+  <div id="biz-list"></div>
+  <button id="add-btn" onclick="openAdd()">
+    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    Add New Client
+  </button>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <div><div id="tb-title">Dashboard</div><div id="tb-sub">Manage your chatbot clients</div></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <a href="/demo.html" target="_blank" class="btn btn-o btn-sm" style="text-decoration:none">
+        <svg viewBox="0 0 24 24" style="fill:currentColor;width:13px;height:13px"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+        Demo Page
+      </a>
+    </div>
+  </div>
+  <div id="content">
+    <div id="vov"></div>
+    <div id="vbiz" style="display:none"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="mo" onclick="closeMo(event)">
+  <div id="md">
+    <div id="md-h">
+      <span id="md-title">Add New Client</span>
+      <button class="btn btn-gh btn-sm" onclick="closeMoD()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
+    <div id="md-b">
+      <form id="bf" onsubmit="saveBiz(event)">
+        <div class="fg">
+          <div class="fi"><label class="fl">Business Name *</label><input class="fin" id="fn" placeholder="e.g. Smile Dental" required></div>
+          <div class="fi"><label class="fl">Industry</label>
+            <select class="fse" id="fi">
+              <option value="">Select industry</option>
+              <option>Dental</option><option>Salon / Beauty</option><option>Gym / Fitness</option>
+              <option>Legal / Law</option><option>Real Estate</option><option>Medical / Healthcare</option>
+              <option>Restaurant</option><option>Retail</option><option>Other</option>
+            </select>
+          </div>
+          <div class="fi"><label class="fl">Bot Name</label><input class="fin" id="fbn" placeholder="e.g. SmileBot"></div>
+          <div class="fi"><label class="fl">Booking Link</label><input class="fin" id="fbk" type="url" placeholder="https://calendly.com/..."></div>
+          <div class="fi full"><label class="fl">Services (comma-separated)</label><input class="fin" id="fsv" placeholder="e.g. Teeth Cleaning, Whitening, Implants"></div>
+          <div class="fi"><label class="fl">Brand Color</label>
+            <div class="cr">
+              <input type="color" id="fcp" value="#185FA5" oninput="document.getElementById('fc').value=this.value">
+              <input class="fin" id="fc" value="#185FA5" placeholder="#185FA5" oninput="if(/^#[0-9A-Fa-f]{6}$/.test(this.value))document.getElementById('fcp').value=this.value">
+            </div>
+          </div>
+          <div class="fi full"><label class="fl">Custom Instructions (optional)</label>
+            <textarea class="fta" id="fpr" placeholder="E.g. We offer free consultations. Hours: Mon-Fri 9am-6pm."></textarea>
+            <span class="fhint">Extra context the bot should know about this business.</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div id="md-f">
+      <button class="btn btn-o" onclick="closeMoD()">Cancel</button>
+      <button class="btn btn-p" onclick="document.getElementById('bf').requestSubmit()" id="md-save">
+        <svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>
+        Save Client
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var S = { businesses:[], stats:null, selId:null, leads:{}, tab:'embed', editId:null };
+
+async function init() {
+  await Promise.all([loadBiz(), loadStats()]);
+  renderSB(); renderOv();
+}
+
+async function loadBiz() {
+  try { var d = await (await fetch('/api/businesses')).json(); S.businesses = d.businesses||[]; } catch(e){ S.businesses=[]; }
+}
+async function loadStats() {
+  try { S.stats = await (await fetch('/api/stats')).json(); } catch(e){}
+}
+async function loadLeads(id) {
+  try { var d = await (await fetch('/api/leads/'+id)).json(); S.leads[id] = d.leads||[]; } catch(e){ S.leads[id]=[]; }
+}
+
+function renderSB() {
+  var s = S.stats||{};
+  document.getElementById('sb-bc').textContent = s.totalBusinesses||S.businesses.length||0;
+  document.getElementById('sb-lc').textContent = s.totalLeads||0;
+  var el = document.getElementById('biz-list');
+  if (!S.businesses.length) { el.innerHTML='<div style="padding:16px 10px;font-size:12px;color:var(--g400);text-align:center">No clients yet — add one below!</div>'; return; }
+  el.innerHTML = S.businesses.map(function(b){
+    return '<div class="bi'+(b.id===S.selId?' active':'')+'" onclick="selBiz(\''+esc(b.id)+'\')">'+
+      '<div class="bi-dot" style="background:'+esc(b.primaryColor)+'"></div>'+
+      '<div class="bi-info"><div class="bi-name">'+esc(b.name)+'</div><div class="bi-meta">'+esc(b.industry||'Business')+'</div></div>'+
+      '<div class="bi-badge">'+(b.leadCount||0)+'</div></div>';
+  }).join('');
+}
+
+function renderOv() {
+  document.getElementById('vbiz').style.display='none';
+  document.getElementById('vov').style.display='';
+  document.getElementById('tb-title').textContent='Dashboard';
+  document.getElementById('tb-sub').textContent='Overview of all your clients';
+  var s=S.stats||{}, rl=s.recentLeads||[];
+  var h = '<div class="sg">'+
+    sc('Active Clients',s.totalBusinesses||0,'All time','ico-b','<path d="M17 11V3H7v4H3v14h8v-4h2v4h8V11h-4zm-6 4H9v-2h2v2zm0-4H9V9h2v2zm0-4H9V5h2v2zm4 8h-2v-2h2v2zm0-4h-2V9h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2z"/>')+
+    sc('Total Leads',s.totalLeads||0,'Captured via chat','ico-g','<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>')+
+    sc('Active Bots',s.activeBots||0,'Live on client sites','ico-p','<path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>')+
+    sc('Leads This Week',s.leadsThisWeek||0,'Last 7 days','ico-o','<path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>') +
+  '</div>';
+  if (rl.length) {
+    h += '<div class="card"><div class="ch"><span class="ct">Recent Leads</span></div><div style="overflow-x:auto"><table class="lt"><thead><tr><th>Name</th><th>Email</th><th>Client</th><th>When</th></tr></thead><tbody>'+
+    rl.map(function(l){ var b=S.businesses.find(function(x){return x.id===l.businessId;}); return '<tr><td class="ln">'+esc(l.name||'—')+'</td><td class="le">'+esc(l.email||'—')+'</td><td>'+esc(b?b.name:l.businessId)+'</td><td class="ltd">'+ft(l.timestamp)+'</td></tr>'; }).join('') +
+    '</tbody></table></div></div>';
+  }
+  if (!S.businesses.length) h += '<div class="wh"><h2>Welcome to ChatBot SaaS 👋</h2><p>Add your first client to generate their embed code and start capturing leads automatically.</p><button class="btn btn-p" onclick="openAdd()">Add Your First Client</button></div>';
+  document.getElementById('vov').innerHTML = h;
+}
+
+function sc(lbl,val,sub,ico,path) {
+  return '<div class="sc"><div class="sc-ico '+ico+'"><svg viewBox="0 0 24 24">'+path+'</svg></div><div class="sc-lbl">'+lbl+'</div><div class="sc-val">'+val+'</div><div class="sc-sub">'+sub+'</div></div>';
+}
+
+async function selBiz(id) {
+  S.selId = id; S.tab = 'embed';
+  var b = S.businesses.find(function(x){return x.id===id;});
+  if (!b) return;
+  await loadLeads(id);
+  document.getElementById('vov').style.display='none';
+  document.getElementById('vbiz').style.display='';
+  document.getElementById('tb-title').textContent = b.name;
+  document.getElementById('tb-sub').textContent = (b.industry||'Business')+' · '+(S.leads[id]||[]).length+' leads captured';
+  renderSB(); renderBV(b);
+}
+
+function renderBV(b) {
+  var leads = S.leads[b.id]||[];
+  var h = '<div class="bdh">'+
+    '<div class="bdh-ico" style="background:'+esc(b.primaryColor)+'22;border:2px solid '+esc(b.primaryColor)+'">🤖</div>'+
+    '<div class="bdh-info"><div class="bdh-name">'+esc(b.name)+'</div><div class="bdh-meta">'+esc(b.industry||'General')+' &middot; '+esc(b.botName)+' &middot; '+leads.length+' leads</div></div>'+
+    '<div class="bdh-acts">'+
+      '<button class="btn btn-o btn-sm" onclick="openEdit(\''+esc(b.id)+'\')">Edit</button>'+
+      '<button class="btn btn-d btn-sm" onclick="delBiz(\''+esc(b.id)+'\')">Delete</button>'+
+    '</div>'+
+  '</div>';
+
+  h += '<div class="card" style="margin-bottom:20px"><div class="cb" style="padding-top:12px;padding-bottom:12px">'+
+    '<div class="tabs">'+
+      tbtn('embed','Embed Code')+tbtn('leads','Leads ('+leads.length+')')+tbtn('preview','Live Preview')+tbtn('settings','Settings')+
+    '</div></div></div>';
+
+  h += '<div id="tc">'+renderTab(b,leads,S.tab)+'</div>';
+  document.getElementById('vbiz').innerHTML = h;
+}
+
+function tbtn(id,lbl) {
+  return '<button class="tb'+(S.tab===id?' active':'')+'" onclick="setTab(\''+id+'\')">'+lbl+'</button>';
+}
+
+function setTab(t) {
+  S.tab = t;
+  var b = S.businesses.find(function(x){return x.id===S.selId;});
+  if (!b) return;
+  var leads = S.leads[b.id]||[];
+  document.querySelectorAll('.tb').forEach(function(el){
+    var map = {embed:'Embed Code',leads:'Leads',preview:'Live Preview',settings:'Settings'};
+    el.classList.toggle('active', el.textContent.startsWith(map[t]||t));
+  });
+  document.getElementById('tc').innerHTML = renderTab(b,leads,t);
+}
+
+function renderTab(b,leads,t) {
+  if (t==='embed') return tabEmbed(b);
+  if (t==='leads') return tabLeads(leads,b.id);
+  if (t==='preview') return '<div class="card"><div class="ch"><span class="ct">Live Bot Preview</span><a href="/preview?id='+b.id+'" target="_blank" class="btn btn-o btn-sm" style="text-decoration:none">Open full page</a></div><div style="padding:0" class="cb"><div class="pw"><iframe src="/preview?id='+b.id+'" title="Bot preview" loading="lazy"></iframe></div></div></div>';
+  if (t==='settings') return tabSettings(b);
+  return '';
+}
+
+function tabEmbed(b) {
+  var orig = window.location.origin;
+  var code = '<script\n  src="'+orig+'/widget.js"\n  data-business="'+b.name+'"\n  data-color="'+b.primaryColor+'"\n  data-bot-name="'+b.botName+'"\n  data-services="'+b.services+'"\n  data-booking="'+b.bookingLink+'"\n  data-id="'+b.id+'"\n  data-api="'+orig+'">\n<\\/script>';
+  return '<div class="card"><div class="ch"><span class="ct">Embed Code</span>'+
+    '<button class="btn btn-p btn-sm" onclick="cpCode(\''+esc(b.id)+'\')"><svg viewBox="0 0 24 24" style="fill:#fff"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>Copy Code</button>'+
+  '</div><div class="cb">'+
+    '<p style="font-size:13px;color:var(--g500);margin-bottom:14px;line-height:1.6">Paste just before the <code style="background:var(--g100);padding:2px 6px;border-radius:4px;font-size:12px">&lt;/body&gt;</code> tag on the client\'s website.</p>'+
+    '<div class="code" id="ec-'+esc(b.id)+'">'+escH(code)+'</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<a href="/preview?id='+b.id+'" target="_blank" class="btn btn-o btn-sm" style="text-decoration:none">Open Preview</a>'+
+      '<button class="btn btn-o btn-sm" onclick="cpCode(\''+esc(b.id)+'\')">Copy to Clipboard</button>'+
+    '</div>'+
+  '</div></div>'+
+  '<div class="card"><div class="ch"><span class="ct">Installation Guide</span></div><div class="cb">'+
+    '<ol style="padding-left:18px;font-size:13.5px;color:var(--g700);line-height:2.2">'+
+      '<li>Click <strong>Copy Code</strong> above</li>'+
+      '<li>Open the client\'s website CMS (WordPress, Wix, Squarespace, etc.)</li>'+
+      '<li>Find the place to add custom HTML/JavaScript</li>'+
+      '<li>Paste the code just before the <code style="background:var(--g100);padding:1px 5px;border-radius:4px">&lt;/body&gt;</code> tag</li>'+
+      '<li>Save & publish — the chat button appears instantly</li>'+
+    '</ol>'+
+  '</div></div>';
+}
+
+function cpCode(bizId) {
+  var el = document.getElementById('ec-'+bizId);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(function(){ toast('Embed code copied!'); }).catch(function(){ toast('Select and copy the code manually'); });
+}
+
+function tabLeads(leads, bizId) {
+  if (!leads.length) return '<div class="card"><div class="cb"><div class="es"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><p>No leads yet. Once visitors chat, they\'ll appear here.</p></div></div></div>';
+  return '<div class="card"><div class="ch"><span class="ct">'+leads.length+' Lead'+(leads.length!==1?'s':'')+' Captured</span>'+
+    '<button class="btn btn-o btn-sm" onclick="expLeads(\''+bizId+'\')">Export CSV</button>'+
+  '</div><div style="overflow-x:auto"><table class="lt"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Date</th><th></th></tr></thead><tbody>'+
+  leads.map(function(l){
+    return '<tr><td class="ln">'+esc(l.name||'—')+'</td>'+
+      '<td><a href="mailto:'+esc(l.email)+'" style="color:var(--blue);text-decoration:none">'+esc(l.email||'—')+'</a></td>'+
+      '<td class="le">'+esc(l.phone||'—')+'</td>'+
+      '<td class="ltd">'+ft(l.timestamp)+'</td>'+
+      '<td><button class="btn btn-gh btn-sm" onclick="delLead(\''+esc(l.id)+'\',\''+esc(bizId)+'\')" title="Delete" style="color:var(--red);padding:4px 8px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:var(--red)"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></td>'+
+    '</tr>';
+  }).join('')+'</tbody></table></div></div>';
+}
+
+function expLeads(bizId) {
+  var leads = S.leads[bizId]||[];
+  if (!leads.length) { toast('No leads to export'); return; }
+  var csv='Name,Email,Phone,Date\n'+leads.map(function(l){ return [l.name,l.email,l.phone,l.timestamp].map(function(v){ return '"'+String(v||'').replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='leads-'+bizId+'.csv'; a.click();
+}
+
+async function delLead(lid, bizId) {
+  if (!confirm('Delete this lead?')) return;
+  await fetch('/api/leads/'+lid,{method:'DELETE'});
+  await loadLeads(bizId); await loadStats(); renderSB();
+  var b=S.businesses.find(function(x){return x.id===bizId;}); if(b) renderBV(b);
+  toast('Lead deleted');
+}
+
+function tabSettings(b) {
+  return '<div class="card"><div class="ch"><span class="ct">Edit Client Settings</span></div><div class="cb">'+
+    '<div class="fg">'+
+      '<div class="fi"><label class="fl">Business Name</label><input class="fin" id="sn" value="'+esc(b.name)+'"></div>'+
+      '<div class="fi"><label class="fl">Industry</label><input class="fin" id="si" value="'+esc(b.industry)+'"></div>'+
+      '<div class="fi"><label class="fl">Bot Name</label><input class="fin" id="sbn" value="'+esc(b.botName)+'"></div>'+
+      '<div class="fi"><label class="fl">Booking Link</label><input class="fin" id="sbk" value="'+esc(b.bookingLink)+'"></div>'+
+      '<div class="fi full"><label class="fl">Services</label><input class="fin" id="ssv" value="'+esc(b.services)+'"></div>'+
+      '<div class="fi"><label class="fl">Brand Color</label><div class="cr"><input type="color" id="scp" value="'+esc(b.primaryColor)+'" oninput="document.getElementById(\'sc\').value=this.value"><input class="fin" id="sc" value="'+esc(b.primaryColor)+'"></div></div>'+
+      '<div class="fi full"><label class="fl">Custom Instructions</label><textarea class="fta" id="spr">'+esc(b.systemPrompt)+'</textarea></div>'+
+    '</div>'+
+    '<div style="margin-top:16px"><button class="btn btn-p" onclick="updBiz(\''+esc(b.id)+'\')">Save Changes</button></div>'+
+  '</div></div>';
+}
+
+async function updBiz(id) {
+  var body={name:document.getElementById('sn').value,industry:document.getElementById('si').value,botName:document.getElementById('sbn').value,bookingLink:document.getElementById('sbk').value,services:document.getElementById('ssv').value,primaryColor:document.getElementById('sc').value,systemPrompt:document.getElementById('spr').value};
+  try {
+    var d=await (await fetch('/api/businesses/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+    if (d.success) { await loadBiz(); await loadStats(); renderSB(); S.selId=id; var b=S.businesses.find(function(x){return x.id===id;}); if(b) renderBV(b); toast('Settings saved!'); }
+  } catch(e){ toast('Error saving'); }
+}
+
+function openAdd() { S.editId=null; document.getElementById('md-title').textContent='Add New Client'; document.getElementById('md-save').textContent='Save Client'; document.getElementById('bf').reset(); document.getElementById('fc').value='#185FA5'; document.getElementById('fcp').value='#185FA5'; document.getElementById('mo').classList.add('open'); }
+function openEdit(id) {
+  var b=S.businesses.find(function(x){return x.id===id;}); if(!b) return;
+  S.editId=id; document.getElementById('md-title').textContent='Edit Client'; document.getElementById('md-save').textContent='Update Client';
+  document.getElementById('fn').value=b.name; document.getElementById('fi').value=b.industry; document.getElementById('fbn').value=b.botName;
+  document.getElementById('fbk').value=b.bookingLink; document.getElementById('fsv').value=b.services; document.getElementById('fc').value=b.primaryColor; document.getElementById('fcp').value=b.primaryColor; document.getElementById('fpr').value=b.systemPrompt;
+  document.getElementById('mo').classList.add('open');
+}
+function closeMo(e){ if(e.target===document.getElementById('mo')) closeMoD(); }
+function closeMoD(){ document.getElementById('mo').classList.remove('open'); }
+
+async function saveBiz(e) {
+  e.preventDefault();
+  var body={name:document.getElementById('fn').value,industry:document.getElementById('fi').value,botName:document.getElementById('fbn').value,bookingLink:document.getElementById('fbk').value,services:document.getElementById('fsv').value,primaryColor:document.getElementById('fc').value,systemPrompt:document.getElementById('fpr').value};
+  try {
+    var url=S.editId?'/api/businesses/'+S.editId:'/api/businesses', method=S.editId?'PUT':'POST';
+    var d=await (await fetch(url,{method:method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+    if (d.success) { closeMoD(); await loadBiz(); await loadStats(); renderSB(); toast(S.editId?'Client updated!':'Client added!'); if(!S.editId) selBiz(d.business.id); }
+    else toast(d.error||'Error saving');
+  } catch(e){ toast('Network error'); }
+}
+
+async function delBiz(id) {
+  var b=S.businesses.find(function(x){return x.id===id;}); if(!b) return;
+  if (!confirm('Delete '+b.name+'? This cannot be undone.')) return;
+  await fetch('/api/businesses/'+id,{method:'DELETE'}); S.selId=null;
+  await loadBiz(); await loadStats(); renderSB(); renderOv(); toast('Client deleted');
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function ft(iso){ if(!iso) return '—'; var d=new Date(iso),now=new Date(),df=Math.floor((now-d)/1000); if(df<60) return 'Just now'; if(df<3600) return Math.floor(df/60)+'m ago'; if(df<86400) return Math.floor(df/3600)+'h ago'; if(df<604800) return Math.floor(df/86400)+'d ago'; return d.toLocaleDateString(); }
+
+var _tt;
+function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){ t.classList.remove('show'); },2500); }
+
+init();
+</script>
+</body>
+</html>
