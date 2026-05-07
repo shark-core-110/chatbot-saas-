@@ -117,7 +117,7 @@ app.post('/api/chat', async (req, res) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       },
-      body: JSON.stringify({ model: 'llama3-8b-8192', messages, max_tokens: 512 }),
+      body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages, max_tokens: 512 }),
       signal: controller.signal,
     });
 
